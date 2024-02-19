@@ -2,12 +2,12 @@ import React from 'react';
 import { Text } from 'react-native';
 
 
-function Welcome() {
+function WelcomeScreen() {
     return (
         <View>
-            <Text>Hello from Welcome!!</Text>
+            <Text>Hello from WelcomeScreen!!</Text>
         </View>
     )
 }
 
-export default Welcome
+export default WelcomeScreen
