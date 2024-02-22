@@ -11,6 +11,3 @@ export const UploadImage = async (imageUri, path) => {
 
   return downloadURL; // This URL can be used to access the image directly
 };
-
-
-// Here imageUri is the local file URI of the image, and path is the desired storage path in Firebase Storage.

@@ -1,5 +1,5 @@
 import { db } from '../../firebaseConfig';
-
+import { collection, getDocs } from 'firebase/firestore';
 
 export const addProduct = async (product) => {
     try {
@@ -15,7 +15,7 @@ export const addProduct = async (product) => {
 
 export const getProducts = async () => {
     try {
-        const querySnapshot = await db.collection('products').get();
+        const querySnapshot = await getDocs(collection(db, 'toys'));
         const products = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data()
@@ -26,27 +26,3 @@ export const getProducts = async () => {
         return [];
     }
 };
-
-// export const addProduct = async (product) => {
-//     try {
-//         const docRef = await db.collection('products').add(product);
-//         console.log('Document written with ID: ', docRef.id);
-//     } catch (error) {
-//         console.log(error);
-//     }
-// };
-
-
-// export const getProducts = async () => {
-//     try {
-//         const querySnapshot = await db.collection('products').get();
-//         const products = querySnapshot.docs.map(doc => ({
-//             id: doc.id,
-//             ...doc.data()
-//         }));
-//         return products;
-//     } catch (error) {
-//         console.log(error);
-//         return [];
-//     }
-// };
