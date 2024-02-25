@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { getProducts } from '../services/ProductService';
-import { auth } from '../../firebaseConfig'
-
+import { auth } from '../../firebaseConfig';
 
 export default function HomeScreen({ navigation }) {
   const [products, setProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -25,47 +25,109 @@ export default function HomeScreen({ navigation }) {
       .catch(error => alert(error.message))
   }
 
-  return (
-    <>
-      <FlatList
-        data={products}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Details', { productId: item.id })}
-            style={styles.card}
-          >
-            <Image source={{ uri: item.imageURL }} style={styles.image} />
-            <View style={styles.infoContainer}>
-              <Text style={styles.title}>{item.Title}</Text>
-              <Text style={styles.price}>${item.Price}</Text>
-              <Text style={styles.description}>{item.Description}</Text>
-              <Text style={styles.rating}>Rating: {item.Rating}</Text>
-            </View>
+  const filteredProducts = products.filter(product =>
+    product.Title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-          </TouchableOpacity>
+  const splitProducts = (arr, size) => {
+    let result = [];
+    for (let i = 0; i < arr.length; i += size) {
+      result.push(arr.slice(i, i + size));
+    }
+    return result;
+  };
+
+  const splitFilteredProducts = splitProducts(filteredProducts, 2);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TextInput
+          placeholder="Search products..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSignout}
+        >
+          <Text style={styles.buttonText}>Sign out</Text>
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        data={splitFilteredProducts}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.row}>
+            {item.map(product => (
+              <TouchableOpacity
+                key={product.id}
+                onPress={() => navigation.navigate('Details', { productId: product.id })}
+                style={styles.card}
+              >
+                <Image source={{ uri: product.imageURL }} style={styles.image} />
+                <View style={styles.infoContainer}>
+                  <Text style={styles.title}>{product.Title}</Text>
+                  <Text style={styles.price}>${product.Price}</Text>
+                  <Text style={styles.description}>{product.Description}</Text>
+                  <Text style={styles.rating}>Rating: {product.Rating}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         )}
         style={styles.list}
       />
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSignout}
-      >
-        <Text style={styles.buttonText}>Sign out</Text>
-      </TouchableOpacity>
-    </>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  searchInput: {
+    fontSize: 16,
+    padding: 10,
+    borderColor: 'gray',
+    borderWidth: 1,
+    borderRadius: 5,
+    width: '70%',
+  },
+  button: {
+    backgroundColor: '#0782F9',
+    padding: 10,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 16,
+  },
   list: {
     padding: 10,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   card: {
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 10,
-    marginBottom: 10,
+    width: '48%',
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
@@ -75,8 +137,8 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   image: {
-    width: 100,
-    height: 100,
+    width: 80,
+    height: 80,
     borderRadius: 8,
     marginRight: 10,
   },
@@ -88,8 +150,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   price: {
-    fontSize: 14,
-    color: '#444',
+    fontSize: 20,
+    color: 'red',
     marginTop: 5,
   },
   description: {
@@ -102,16 +164,4 @@ const styles = StyleSheet.create({
     color: '#888',
     marginTop: 5,
   },
-  button: {
-    backgroundColor: '#0782F9',
-    width: "100%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: 'center'
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: '700',
-    fontSize: 16
-  }
 });

@@ -9,5 +9,5 @@ export const UploadImage = async (imageUri, path) => {
   const snapshot = await ref.put(blob);
   const downloadURL = await snapshot.ref.getDownloadURL();
 
-  return downloadURL; // This URL can be used to access the image directly
+  return downloadURL;
 };

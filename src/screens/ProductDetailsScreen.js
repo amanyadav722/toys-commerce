@@ -7,7 +7,7 @@ export default function ProductDetailsScreen({ route, navigation }) {
   const { productId } = route.params;
   const [product, setProduct] = useState(null);
 
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, addToFavourites } = useContext(CartContext);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -24,6 +24,11 @@ export default function ProductDetailsScreen({ route, navigation }) {
     navigation.navigate('Cart');
   };
 
+  const handleAddToFavourites = () => {
+    addToFavourites(product);
+    navigation.navigate('Favourites');
+  };
+
   if (!product) {
     return <Text>Loading...</Text>;
   }
@@ -38,6 +43,9 @@ export default function ProductDetailsScreen({ route, navigation }) {
       <Text>Rating: {product.Rating}</Text>
       <Pressable onPress={handleAddToCart} style={styles.button}>
         <Text style={styles.buttonText}>Add to Cart</Text>
+      </Pressable>
+      <Pressable onPress={handleAddToFavourites} style={styles.button}>
+        <Text style={styles.buttonText}>Add to Favorites</Text>
       </Pressable>
     </View>
   );
